@@ -1,49 +1,53 @@
-const words = ["apple", "banana", "orange", "grape", "melon", "pear"];
+#!/usr/bin/env node
 
-const getRandomWord = () => {
-  return words[Math.floor(Math.random() * words.length)];
+// eslint-disable-next-line import/no-extraneous-dependencies
+const readlineSync = require('readline-sync');
+
+const words = ['apple', 'banana', 'orange', 'grape', 'pineapple'];
+
+function selectRandomWord() {
+  const randomIndex = Math.floor(Math.random() * words.length);
+  return words[randomIndex];
 }
 
-const checkGuess = (word, guess) => {
-  const wordChars = word.split("");
-  const guessChars = guess.split("");
-  
-  let result = "";
-  
-  for (let i = 0; i < wordChars.length; i++) {
-    if (wordChars[i] === guessChars[i]) {
-      result += wordChars[i];
-    } else if (wordChars.includes(guessChars[i])) {
-      result += "-";
+function checkGuess(word, guess) {
+  let result = '';
+  for (let i = 0; i < word.length; i += 1) {
+    if (word.includes(guess[i])) {
+      if (word[i] === guess[i]) {
+        result += guess[i].toUpperCase();
+      } else {
+        result += guess[i].toLowerCase();
+      }
     } else {
-      result += "*";
+      result += '-';
     }
   }
-  
   return result;
 }
 
-const playWordle = () => {
-  const wordToGuess = getRandomWord();
-  console.log("Welcome to Wordle! Try to guess the 5-letter word.");
-  
-  let attempts = 0;
-  let guessedWord = "";
-  
-  while (attempts < 5 && guessedWord !== wordToGuess) {
-    console.log(`Attempt ${attempts + 1}:`);
-    guessedWord = readlineSync.question("Enter your guess: ");
-    
-    const result = checkGuess(wordToGuess, guessedWord);
-    
+function playWordle() {
+  const word = selectRandomWord();
+  let remainingAttempts = 5;
+
+  console.log('Добро пожаловать в Wordle! Попробуйте угадать слово за 5 попыток.');
+
+  while (remainingAttempts > 0) {
+    const guess = readlineSync.question(`Попытка ${6 - remainingAttempts}: `);
+
+    if (guess === word) {
+      console.log(`Поздравляю! Вы угадали это слово "${word}" правильно.`);
+      return;
+    }
+    const result = checkGuess(word, guess);
     console.log(result);
-    attempts++;
-  }
-  
-  if (guessedWord === wordToGuess) {
-    console.log("Congratulations! You guessed the word correctly.");
-  } else {
-    console.log(`Sorry, you ran out of attempts. The word was ${wordToGuess}.`);
+
+    remainingAttempts -= 1;
+    if (remainingAttempts > 0) {
+      console.log(`Оставшиеся попытки: ${remainingAttempts}`);
+    } else {
+      console.log(`Закончились попытки! Слово было "${word}".`);
+    }
   }
 }
 
